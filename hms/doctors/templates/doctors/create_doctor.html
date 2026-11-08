@@ -1,0 +1,72 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Doctor</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link rel="stylesheet" href="{% static 'dashboard/styles.css' %}">
+</head>
+<body>
+    <div class="dashboard-shell">
+        <aside class="sidebar">
+            <div class="brand">
+                <div class="brand-mark">+</div>
+                <h2>CareSync</h2>
+            </div>
+            <div class="nav-group">
+                <div class="nav-group-title">Overview</div>
+                <a class="nav-link" href="{% url 'dashboard_home' %}"><i class="nav-icon fa-solid fa-house"></i> Dashboard</a>
+                <a class="nav-link" href="{% url 'patients' %}"><i class="nav-icon fa-solid fa-users"></i> Patients</a>
+                <a class="nav-link active" href="{% url 'doctor_home' %}"><i class="nav-icon fa-solid fa-user-doctor"></i> Doctors</a>
+                <a class="nav-link" href="{% url 'appointments_home' %}"><i class="nav-icon fa-solid fa-calendar-check"></i> Appointments</a>
+                <a class="nav-link" href="{% url 'profile' %}"><i class="nav-icon fa-solid fa-user"></i> Profile</a>
+            </div>
+        </aside>
+
+        <main class="main">
+            <header class="topbar">
+                <div>
+                    <p class="section-kicker">New staff member</p>
+                    <h1>Add doctor</h1>
+                </div>
+            </header>
+
+            <section class="card" style="max-width: 720px;">
+                {% if messages %}
+                    {% for message in messages %}
+                        <div class="pill {% if message.tags == 'error' %}danger{% else %}success{% endif %}" style="margin-bottom: 16px; display: inline-block;">{{ message }}</div>
+                    {% endfor %}
+                {% endif %}
+
+                <form method="post" style="display:grid; gap:18px;">
+                    {% csrf_token %}
+                    <div style="display:grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap:18px;">
+                        <div>
+                            <label style="display:block; margin-bottom:8px; color: var(--muted); font-weight:600;">Doctor name</label>
+                            <input type="text" name="name" value="{{ doctor.name|default:'' }}" required style="width:100%; padding: 12px 14px; border-radius: 12px; border:1px solid var(--line); background: var(--panel-soft);">
+                        </div>
+                        <div>
+                            <label style="display:block; margin-bottom:8px; color: var(--muted); font-weight:600;">Specialization</label>
+                            <input type="text" name="specialization" value="{{ doctor.specialization|default:'' }}" required style="width:100%; padding: 12px 14px; border-radius: 12px; border:1px solid var(--line); background: var(--panel-soft);">
+                        </div>
+                        <div>
+                            <label style="display:block; margin-bottom:8px; color: var(--muted); font-weight:600;">Email</label>
+                            <input type="email" name="email" value="{{ doctor.email|default:'' }}" required style="width:100%; padding: 12px 14px; border-radius: 12px; border:1px solid var(--line); background: var(--panel-soft);">
+                        </div>
+                        <div>
+                            <label style="display:block; margin-bottom:8px; color: var(--muted); font-weight:600;">Phone number</label>
+                            <input type="text" name="phone_number" value="{{ doctor.phone_number|default:'' }}" required style="width:100%; padding: 12px 14px; border-radius: 12px; border:1px solid var(--line); background: var(--panel-soft);">
+                        </div>
+                    </div>
+                    <div style="display:flex; gap:12px; flex-wrap:wrap;">
+                        <button class="toggle-btn" type="submit">{% if is_edit %}Update doctor{% else %}Save doctor{% endif %}</button>
+                        <a href="{% url 'doctor_home' %}" class="badge" style="text-decoration:none;">Cancel</a>
+                    </div>
+                </form>
+            </section>
+        </main>
+    </div>
+</body>
+</html>

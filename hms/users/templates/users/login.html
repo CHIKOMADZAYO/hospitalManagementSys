@@ -1,0 +1,51 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link rel="stylesheet" href="{% static 'dashboard/styles.css' %}">
+</head>
+<body>
+    <div class="auth-page">
+        <div class="auth-shell">
+            <div class="auth-visual">
+                <div class="brand">
+                    <div class="brand-mark">+</div>
+                    <h2>CareSync</h2>
+                </div>
+                <div>
+                    <p class="section-kicker" style="color:#dfeeff;">Healthcare operations</p>
+                    <h1>Smart care coordination for every patient journey.</h1>
+                </div>
+                <div class="auth-feature-list">
+                    <div class="auth-feature-item"><i class="fa-solid fa-shield-heart"></i> Secure staff access</div>
+                    <div class="auth-feature-item"><i class="fa-solid fa-calendar-check"></i> Appointment visibility</div>
+                    <div class="auth-feature-item"><i class="fa-solid fa-chart-line"></i> Clinical reporting</div>
+                </div>
+            </div>
+
+            <div class="auth-card">
+                <h2>Welcome back</h2>
+                <p class="subtitle">Sign in to continue to your dashboard.</p>
+
+                {% if messages %}
+                    {% for message in messages %}
+                        <div class="pill success" style="margin-bottom: 16px; display: inline-block;">{{ message }}</div>
+                    {% endfor %}
+                {% endif %}
+
+                <form method="post" class="auth-form">
+                    {% csrf_token %}
+                    {{ form.as_p }}
+                    <button type="submit" class="auth-button">Login</button>
+                </form>
+
+                <p class="auth-footer">Need an account? <a href="{% url 'register' %}">Register here</a></p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

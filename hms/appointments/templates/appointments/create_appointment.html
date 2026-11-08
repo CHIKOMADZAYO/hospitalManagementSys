@@ -1,0 +1,90 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% if is_edit %}Edit Appointment{% else %}Create Appointment{% endif %}</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link rel="stylesheet" href="{% static 'dashboard/styles.css' %}">
+</head>
+<body>
+    <div class="dashboard-shell">
+        <aside class="sidebar">
+            <div class="brand">
+                <div class="brand-mark">+</div>
+                <h2>CareSync</h2>
+            </div>
+            <div class="nav-group">
+                <div class="nav-group-title">Overview</div>
+                <a class="nav-link" href="{% url 'dashboard_home' %}"><i class="nav-icon fa-solid fa-house"></i> Dashboard</a>
+                <a class="nav-link" href="{% url 'patients' %}"><i class="nav-icon fa-solid fa-users"></i> Patients</a>
+                <a class="nav-link" href="{% url 'doctor_home' %}"><i class="nav-icon fa-solid fa-user-doctor"></i> Doctors</a>
+                <a class="nav-link active" href="{% url 'appointments_home' %}"><i class="nav-icon fa-solid fa-calendar-check"></i> Appointments</a>
+                <a class="nav-link" href="{% url 'profile' %}"><i class="nav-icon fa-solid fa-user"></i> Profile</a>
+            </div>
+        </aside>
+
+        <main class="main">
+            <header class="topbar">
+                <div>
+                    <p class="section-kicker">Schedule</p>
+                    <h1>{% if is_edit %}Edit appointment{% else %}Create appointment{% endif %}</h1>
+                </div>
+            </header>
+
+            <section class="card" style="max-width: 760px;">
+                {% if messages %}
+                    {% for message in messages %}
+                        <div class="pill {% if message.tags == 'error' %}danger{% else %}success{% endif %}" style="margin-bottom: 16px; display: inline-block;">{{ message }}</div>
+                    {% endfor %}
+                {% endif %}
+
+                <form method="post" style="display:grid; gap:18px;">
+                    {% csrf_token %}
+                    <div style="display:grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap:18px;">
+                        <div>
+                            <label style="display:block; margin-bottom:8px; color: var(--muted); font-weight:600;">Patient</label>
+                            <select name="patient" required style="width:100%; padding: 12px 14px; border-radius: 12px; border:1px solid var(--line); background: var(--panel-soft);">
+                                <option value="">-- Select patient --</option>
+                                {% for patient in patients %}
+                                    <option value="{{ patient.id }}" {% if appointment and appointment.patient_id == patient.id %}selected{% endif %}>{{ patient.first_name }} {{ patient.last_name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div>
+                            <label style="display:block; margin-bottom:8px; color: var(--muted); font-weight:600;">Doctor</label>
+                            <select name="doctor" required style="width:100%; padding: 12px 14px; border-radius: 12px; border:1px solid var(--line); background: var(--panel-soft);">
+                                <option value="">-- Select doctor --</option>
+                                {% for doctor in doctors %}
+                                    <option value="{{ doctor.id }}" {% if appointment and appointment.doctor_id == doctor.id %}selected{% endif %}>{{ doctor.name }} - {{ doctor.specialization }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div>
+                            <label style="display:block; margin-bottom:8px; color: var(--muted); font-weight:600;">Appointment date</label>
+                            <input type="datetime-local" name="appointment_date" value="{% if appointment %}{{ appointment.appointment_date|date:'Y-m-d\TH:i' }}{% endif %}" required style="width:100%; padding: 12px 14px; border-radius: 12px; border:1px solid var(--line); background: var(--panel-soft);">
+                        </div>
+                        <div>
+                            <label style="display:block; margin-bottom:8px; color: var(--muted); font-weight:600;">Status</label>
+                            <select name="status" style="width:100%; padding: 12px 14px; border-radius: 12px; border:1px solid var(--line); background: var(--panel-soft);">
+                                <option value="scheduled" {% if appointment and appointment.status == 'scheduled' %}selected{% endif %}>Scheduled</option>
+                                <option value="completed" {% if appointment and appointment.status == 'completed' %}selected{% endif %}>Completed</option>
+                                <option value="cancelled" {% if appointment and appointment.status == 'cancelled' %}selected{% endif %}>Cancelled</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div>
+                        <label style="display:block; margin-bottom:8px; color: var(--muted); font-weight:600;">Notes</label>
+                        <textarea name="notes" rows="5" style="width:100%; padding: 12px 14px; border-radius: 12px; border:1px solid var(--line); background: var(--panel-soft); resize: vertical;">{% if appointment %}{{ appointment.notes }}{% endif %}</textarea>
+                    </div>
+                    <div style="display:flex; gap:12px; flex-wrap:wrap;">
+                        <button class="toggle-btn" type="submit">{% if is_edit %}Update appointment{% else %}Create appointment{% endif %}</button>
+                        <a href="{% url 'appointments_home' %}" class="badge" style="text-decoration:none;">Back to list</a>
+                    </div>
+                </form>
+            </section>
+        </main>
+    </div>
+</body>
+</html>

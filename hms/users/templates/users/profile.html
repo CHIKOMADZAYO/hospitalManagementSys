@@ -1,0 +1,120 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Profile</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link rel="stylesheet" href="{% static 'dashboard/styles.css' %}">
+</head>
+<body>
+    <div class="dashboard-shell">
+        <aside class="sidebar">
+            <div class="brand">
+                <div class="brand-mark">+</div>
+                <h2>CareSync</h2>
+            </div>
+            <div class="nav-group">
+                <div class="nav-group-title">Overview</div>
+                <a class="nav-link" href="{% url 'dashboard_home' %}"><i class="nav-icon fa-solid fa-house"></i> Dashboard</a>
+                <a class="nav-link" href="{% url 'patients' %}"><i class="nav-icon fa-solid fa-users"></i> Patients</a>
+                <a class="nav-link" href="{% url 'doctor_home' %}"><i class="nav-icon fa-solid fa-user-doctor"></i> Doctors</a>
+                <a class="nav-link" href="{% url 'appointments_home' %}"><i class="nav-icon fa-solid fa-calendar-check"></i> Appointments</a>
+                <a class="nav-link active" href="{% url 'profile' %}"><i class="nav-icon fa-solid fa-user"></i> Profile</a>
+            </div>
+            <div class="nav-group">
+                <div class="nav-group-title">System</div>
+                <a class="nav-link" href="{% url 'logout' %}"><i class="nav-icon fa-solid fa-right-from-bracket"></i> Logout</a>
+            </div>
+        </aside>
+
+        <main class="main">
+            <header class="topbar">
+                <div>
+                    <p class="section-kicker">Account</p>
+                    <h1>{{ request.user.username }} profile</h1>
+                </div>
+                <div class="profile-pill">
+                    <div class="avatar">{{ request.user.username|slice:':1'|upper }}</div>
+                    <div>
+                        <strong>{{ request.user.username }}</strong><br>
+                        <small>{{ profile.role|title }}</small>
+                    </div>
+                </div>
+            </header>
+
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="pill success" style="margin-bottom: 18px; display: inline-block;">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+
+            <section class="profile-layout">
+                <div class="profile-side">
+                    <div class="profile-avatar">{{ request.user.username|slice:':1'|upper }}</div>
+                    <div class="profile-meta">
+                        <div class="profile-stat">
+                            <span>Role</span>
+                            <strong>{{ profile.role|title }}</strong>
+                        </div>
+                        <div class="profile-stat">
+                            <span>Phone</span>
+                            <strong>{{ profile.phone|default:'Not provided' }}</strong>
+                        </div>
+                        <div class="profile-stat">
+                            <span>Doctor link</span>
+                            <strong>{{ profile.doctor|default:'Not linked' }}</strong>
+                        </div>
+                        <div class="profile-stat">
+                            <span>Patient link</span>
+                            <strong>{{ profile.patient|default:'Not linked' }}</strong>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="profile-main">
+                    <form method="post" class="auth-form">
+                        {% csrf_token %}
+                        <div class="profile-grid">
+                            <div>
+                                <label for="role">Role</label>
+                                <select name="role" id="role">
+                                    <option value="admin" {% if profile.role == 'admin' %}selected{% endif %}>Admin</option>
+                                    <option value="doctor" {% if profile.role == 'doctor' %}selected{% endif %}>Doctor</option>
+                                    <option value="reception" {% if profile.role == 'reception' %}selected{% endif %}>Reception</option>
+                                    <option value="nurse" {% if profile.role == 'nurse' %}selected{% endif %}>Nurse</option>
+                                    <option value="patient" {% if profile.role == 'patient' %}selected{% endif %}>Patient</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label for="phone">Phone</label>
+                                <input type="text" name="phone" id="phone" value="{{ profile.phone|default:'' }}">
+                            </div>
+                            <div>
+                                <label for="doctor">Linked doctor</label>
+                                <select name="doctor" id="doctor">
+                                    <option value="">-- None --</option>
+                                    {% for doctor in doctors %}
+                                        <option value="{{ doctor.id }}" {% if profile.doctor_id == doctor.id %}selected{% endif %}>{{ doctor.name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div>
+                                <label for="patient">Linked patient</label>
+                                <select name="patient" id="patient">
+                                    <option value="">-- None --</option>
+                                    {% for patient in patients %}
+                                        <option value="{{ patient.id }}" {% if profile.patient_id == patient.id %}selected{% endif %}>{{ patient.first_name }} {{ patient.last_name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                        <button type="submit" class="auth-button">Save profile</button>
+                    </form>
+                </div>
+            </section>
+        </main>
+    </div>
+</body>
+</html>

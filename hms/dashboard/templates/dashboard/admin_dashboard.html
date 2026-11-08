@@ -1,0 +1,273 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Healthcare Dashboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link rel="stylesheet" href="{% static 'dashboard/styles.css' %}">
+</head>
+<body>
+    <div class="dashboard-shell">
+        <aside class="sidebar">
+            <div class="brand">
+                <div class="brand-mark">+ </div>
+                <h2>CareSync</h2>
+            </div>
+
+            <div class="nav-group">
+                <div class="nav-group-title">Overview</div>
+                <a class="nav-link active" href="{% url 'dashboard_home' %}"><i class="nav-icon fa-solid fa-house"></i> Dashboard</a>
+                <a class="nav-link" href="{% url 'patients' %}"><i class="nav-icon fa-solid fa-users"></i> Patients</a>
+                <a class="nav-link" href="{% url 'doctor_home' %}"><i class="nav-icon fa-solid fa-user-doctor"></i> Doctors</a>
+                <a class="nav-link" href="{% url 'appointments_home' %}"><i class="nav-icon fa-solid fa-calendar-check"></i> Appointments</a>
+                <a class="nav-link" href="{% url 'profile' %}"><i class="nav-icon fa-solid fa-user"></i> Profile</a>
+            </div>
+
+            <div class="nav-group">
+                <div class="nav-group-title">Operations</div>
+                <a class="nav-link" href="#"><i class="nav-icon fa-solid fa-credit-card"></i> Billing</a>
+                <a class="nav-link" href="#"><i class="nav-icon fa-solid fa-hospital"></i> Departments</a>
+                <a class="nav-link" href="{% url 'logout' %}"><i class="nav-icon fa-solid fa-right-from-bracket"></i> Logout</a>
+            </div>
+        </aside>
+
+        <main class="main">
+            <header class="topbar">
+                <div>
+                    <p class="section-kicker">Clinical operations</p>
+                    <h1>Patient Management</h1>
+                </div>
+                <div class="topbar-actions">
+                    <input id="dashboardSearch" class="searchbox" type="text" placeholder="Search patients, doctors...">
+                    <button id="themeToggle" class="toggle-btn" type="button">Dark mode</button>
+                    <div class="profile-pill">
+                        <div class="avatar">{{ request.user.username|slice:':1'|upper }}</div>
+                        <div>
+                            <strong>{{ request.user.username }}</strong><br>
+                            <small>{{ profile.role|title }}</small>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <section class="kpi-grid">
+                <div class="kpi-card">
+                    <div class="kpi-head">
+                        <span class="kpi-label">Patients</span>
+                        <div class="kpi-icon primary"><i class="fa-solid fa-bed-pulse"></i></div>
+                    </div>
+                    <p class="kpi-value">{{ patient_count }}</p>
+                    <div class="kpi-trend positive">+12.4% vs last month</div>
+                </div>
+
+                <div class="kpi-card">
+                    <div class="kpi-head">
+                        <span class="kpi-label">Admissions</span>
+                        <div class="kpi-icon secondary"><i class="fa-solid fa-hospital-user"></i></div>
+                    </div>
+                    <p class="kpi-value">{{ appointment_count }}</p>
+                    <div class="kpi-trend positive">24 new this week</div>
+                </div>
+
+                <div class="kpi-card">
+                    <div class="kpi-head">
+                        <span class="kpi-label">Appointments</span>
+                        <div class="kpi-icon warning"><i class="fa-solid fa-calendar-check"></i></div>
+                    </div>
+                    <p class="kpi-value">{{ scheduled_count }}</p>
+                    <div class="kpi-trend positive">{{ appointment_count }} scheduled</div>
+                </div>
+
+                <div class="kpi-card">
+                    <div class="kpi-head">
+                        <span class="kpi-label">Critical Care</span>
+                        <div class="kpi-icon danger"><i class="fa-solid fa-triangle-exclamation"></i></div>
+                    </div>
+                    <p class="kpi-value">08</p>
+                    <div class="kpi-trend negative">3 require rapid review</div>
+                </div>
+            </section>
+
+            <section class="content-grid">
+                <div class="card chart-card">
+                    <div class="card-header">
+                        <h3>Monthly Activity</h3>
+                        <span class="badge">2026</span>
+                    </div>
+
+                    <div class="chart-wrap">
+                        <canvas id="analyticsChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="side-stack">
+                    <div class="card assistant-card">
+                        <div class="card-header">
+                            <h3>Care coordination</h3>
+                            <span class="live-indicator">Live</span>
+                        </div>
+                        <p class="assistant-text">7 patient check-ins need follow-up this afternoon.</p>
+                        <ul class="list compact-list">
+                            <li><span>Clinic load</span><strong>82%</strong></li>
+                            <li><span>Bed occupancy</span><strong>64%</strong></li>
+                            <li><span>Risk alerts</span><strong>3</strong></li>
+                        </ul>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <h3>Highlights</h3>
+                        </div>
+                        <div class="metric-group">
+                            <div class="mini-stat">
+                                <span class="kpi-label">Avg. satisfaction</span>
+                                <strong>96.4%</strong>
+                            </div>
+                            <div class="mini-stat">
+                                <span class="kpi-label">Patient retention</span>
+                                <strong>89.2%</strong>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <h3>Priority Care</h3>
+                        </div>
+                        <ul class="list">
+                            <li>
+                                <div class="person">
+                                    <div class="mini-avatar">EM</div>
+                                    <div><span>Emergency Review</span><small>High priority</small></div>
+                                </div>
+                                <span class="pill danger">8</span>
+                            </li>
+                            <li>
+                                <div class="person">
+                                    <div class="mini-avatar">OP</div>
+                                    <div><span>Outpatient Queue</span><small>Pending</small></div>
+                                </div>
+                                <span class="pill warning">24</span>
+                            </li>
+                            <li>
+                                <div class="person">
+                                    <div class="mini-avatar">IC</div>
+                                    <div><span>Intensive Care</span><small>Stable</small></div>
+                                </div>
+                                <span class="pill success">19</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <section class="dashboard-panels">
+                <div class="card">
+                    <div class="card-header">
+                        <h3>Patient Demographics</h3>
+                        <span class="badge">Overview</span>
+                    </div>
+
+                    <div class="demographic-list">
+                        <div class="demo-row">
+                            <span>0-18 years</span>
+                            <div class="demo-bar"><i style="width: 28%"></i></div>
+                            <strong>28%</strong>
+                        </div>
+                        <div class="demo-row">
+                            <span>19-35 years</span>
+                            <div class="demo-bar"><i style="width: 46%"></i></div>
+                            <strong>46%</strong>
+                        </div>
+                        <div class="demo-row">
+                            <span>36-55 years</span>
+                            <div class="demo-bar"><i style="width: 63%"></i></div>
+                            <strong>63%</strong>
+                        </div>
+                        <div class="demo-row">
+                            <span>55+ years</span>
+                            <div class="demo-bar"><i style="width: 72%"></i></div>
+                            <strong>72%</strong>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h3>Admission Tracking</h3>
+                        <span class="badge">Live</span>
+                    </div>
+                    <ul class="list">
+                        <li><span>Today</span><strong>132</strong></li>
+                        <li><span>This week</span><strong>872</strong></li>
+                        <li><span>ICU patients</span><strong>41</strong></li>
+                        <li><span>Discharges</span><strong>96</strong></li>
+                    </ul>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h3>Critical Condition Analysis</h3>
+                        <span class="badge">Priority</span>
+                    </div>
+                    <ul class="list critical-list">
+                        <li><span>Cardiology</span><strong>18</strong></li>
+                        <li><span>Respiratory</span><strong>12</strong></li>
+                        <li><span>Neurology</span><strong>09</strong></li>
+                        <li><span>Diabetes</span><strong>14</strong></li>
+                    </ul>
+                </div>
+            </section>
+
+            <section class="card" style="margin-top: 24px;">
+                <div class="card-header">
+                    <h3>Recent Appointments</h3>
+                    <a href="{% url 'appointments_home' %}" class="badge">Manage</a>
+                </div>
+
+                <div class="table-wrap">
+                    <table id="appointmentTable" class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Patient</th>
+                                <th>Doctor</th>
+                                <th>Date</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% if recent_appointments %}
+                                {% for appointment in recent_appointments %}
+                                    <tr>
+                                        <td>{{ appointment.patient }}</td>
+                                        <td>{{ appointment.doctor }}</td>
+                                        <td>{{ appointment.appointment_date|date:"M d, Y H:i" }}</td>
+                                        <td><span class="pill {% if appointment.status == 'completed' %}success{% elif appointment.status == 'cancelled' %}danger{% else %}warning{% endif %}">{{ appointment.status|title }}</span></td>
+                                    </tr>
+                                {% endfor %}
+                            {% else %}
+                                <tr>
+                                    <td colspan="4">No appointments available.</td>
+                                </tr>
+                            {% endif %}
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </main>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="{% static 'dashboard/dashboard.js' %}"></script>
+    <script>
+        window.dashboardStats = {
+            patients: {{ patient_count }},
+            doctors: {{ doctor_count }},
+            appointments: {{ appointment_count }},
+            scheduled: {{ scheduled_count }},
+            completed: {{ completed_count }}
+        };
+    </script>
+</body>
+</html>

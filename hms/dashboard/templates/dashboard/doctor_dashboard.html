@@ -1,0 +1,97 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Doctor Dashboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link rel="stylesheet" href="{% static 'dashboard/styles.css' %}">
+</head>
+<body>
+    <div class="dashboard-shell">
+        <aside class="sidebar">
+            <div class="brand">
+                <div class="brand-mark">+</div>
+                <h2>CareSync</h2>
+            </div>
+            <div class="nav-group">
+                <div class="nav-group-title">Main</div>
+                <a class="nav-link active" href="{% url 'dashboard_home' %}"><i class="nav-icon fa-solid fa-house"></i> Dashboard</a>
+                <a class="nav-link" href="{% url 'appointments_home' %}"><i class="nav-icon fa-solid fa-calendar-check"></i> Appointments</a>
+                <a class="nav-link" href="{% url 'profile' %}"><i class="nav-icon fa-solid fa-user"></i> Profile</a>
+                <a class="nav-link" href="{% url 'logout' %}"><i class="nav-icon fa-solid fa-right-from-bracket"></i> Logout</a>
+            </div>
+        </aside>
+
+        <main class="main">
+            <header class="topbar">
+                <h1>Doctor Portal</h1>
+                <div class="topbar-actions">
+                    <input id="dashboardSearch" class="searchbox" type="text" placeholder="Search appointments...">
+                    <button id="themeToggle" class="toggle-btn" type="button">Dark mode</button>
+                    <div class="profile-pill">
+                        <div class="avatar">{{ request.user.username|slice:':1'|upper }}</div>
+                        <div>
+                            <strong>{{ request.user.username }}</strong><br>
+                            <small>{{ profile.role|title }}</small>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <section class="kpi-grid">
+                <div class="kpi-card">
+                    <div class="kpi-head">
+                        <span class="kpi-label">Appointments</span>
+                        <div class="kpi-icon primary">📅</div>
+                    </div>
+                    <p class="kpi-value">{{ appointment_count }}</p>
+                    <div class="kpi-trend positive">{{ scheduled_count }} scheduled</div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-head">
+                        <span class="kpi-label">Completed</span>
+                        <div class="kpi-icon secondary">✅</div>
+                    </div>
+                    <p class="kpi-value">{{ completed_count }}</p>
+                    <div class="kpi-trend positive">Excellent follow-up</div>
+                </div>
+            </section>
+
+            <section class="card">
+                <div class="card-header">
+                    <h3>Upcoming Appointments</h3>
+                    <span class="badge">Today</span>
+                </div>
+
+                <div class="table-wrap">
+                    <table id="appointmentTable" class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Patient</th>
+                                <th>Time</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% if recent_appointments %}
+                                {% for appointment in recent_appointments %}
+                                    <tr>
+                                        <td>{{ appointment.patient }}</td>
+                                        <td>{{ appointment.appointment_date|date:"M d, Y H:i" }}</td>
+                                        <td><span class="pill {% if appointment.status == 'completed' %}success{% elif appointment.status == 'cancelled' %}danger{% else %}warning{% endif %}">{{ appointment.status|title }}</span></td>
+                                    </tr>
+                                {% endfor %}
+                            {% else %}
+                                <tr><td colspan="3">No appointments assigned yet.</td></tr>
+                            {% endif %}
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </main>
+    </div>
+    <script src="{% static 'dashboard/dashboard.js' %}"></script>
+</body>
+</html>

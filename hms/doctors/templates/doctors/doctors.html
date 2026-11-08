@@ -1,0 +1,104 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Doctors</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link rel="stylesheet" href="{% static 'dashboard/styles.css' %}">
+</head>
+<body>
+    <div class="dashboard-shell">
+        <aside class="sidebar">
+            <div class="brand">
+                <div class="brand-mark">+</div>
+                <h2>CareSync</h2>
+            </div>
+            <div class="nav-group">
+                <div class="nav-group-title">Overview</div>
+                <a class="nav-link" href="{% url 'dashboard_home' %}"><i class="nav-icon fa-solid fa-house"></i> Dashboard</a>
+                <a class="nav-link" href="{% url 'patients' %}"><i class="nav-icon fa-solid fa-users"></i> Patients</a>
+                <a class="nav-link active" href="{% url 'doctor_home' %}"><i class="nav-icon fa-solid fa-user-doctor"></i> Doctors</a>
+                <a class="nav-link" href="{% url 'appointments_home' %}"><i class="nav-icon fa-solid fa-calendar-check"></i> Appointments</a>
+                <a class="nav-link" href="{% url 'profile' %}"><i class="nav-icon fa-solid fa-user"></i> Profile</a>
+            </div>
+            <div class="nav-group">
+                <div class="nav-group-title">System</div>
+                <a class="nav-link" href="{% url 'logout' %}"><i class="nav-icon fa-solid fa-right-from-bracket"></i> Logout</a>
+            </div>
+        </aside>
+
+        <main class="main">
+            <header class="topbar">
+                <div>
+                    <p class="section-kicker">Clinical team</p>
+                    <h1>Doctors</h1>
+                </div>
+                <div class="topbar-actions">
+                    <a href="{% url 'create_doctor' %}" class="toggle-btn" style="text-decoration:none; display:inline-flex; align-items:center;">Add doctor</a>
+                    <div class="profile-pill">
+                        <div class="avatar">{{ request.user.username|slice:':1'|upper }}</div>
+                        <div>
+                            <strong>{{ request.user.username }}</strong><br>
+                            <small>{{ request.user.profile.role|title }}</small>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="pill {% if message.tags == 'error' %}danger{% else %}success{% endif %}" style="margin-bottom: 16px; display: inline-block;">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+
+            <section class="card">
+                <div class="card-header">
+                    <h3>Medical staff</h3>
+                    <span class="badge">{{ doctors|length }} doctors</span>
+                </div>
+
+                <div class="table-wrap">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Specialization</th>
+                                <th>Email</th>
+                                <th>Phone</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% if doctors %}
+                                {% for doctor in doctors %}
+                                    <tr>
+                                        <td>{{ doctor.name }}</td>
+                                        <td>{{ doctor.specialization }}</td>
+                                        <td>{{ doctor.email }}</td>
+                                        <td>{{ doctor.phone_number }}</td>
+                                        <td>
+                                            <div style="display:flex; gap:10px; align-items:center;">
+                                                <a href="{% url 'edit_doctor' doctor.pk %}" class="badge" style="text-decoration:none;">Edit</a>
+                                                <form method="post" action="{% url 'delete_doctor' doctor.pk %}" style="margin:0;">
+                                                    {% csrf_token %}
+                                                    <button type="submit" class="pill danger" style="border:none; cursor:pointer;">Delete</button>
+                                                </form>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            {% else %}
+                                <tr>
+                                    <td colspan="5">No doctors added yet.</td>
+                                </tr>
+                            {% endif %}
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </main>
+    </div>
+</body>
+</html>

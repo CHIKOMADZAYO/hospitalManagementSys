@@ -1,0 +1,89 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% if is_edit %}Edit Patient{% else %}Add Patient{% endif %}</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link rel="stylesheet" href="{% static 'dashboard/styles.css' %}">
+</head>
+<body>
+    <div class="dashboard-shell">
+        <aside class="sidebar">
+            <div class="brand">
+                <div class="brand-mark">+</div>
+                <h2>CareSync</h2>
+            </div>
+            <div class="nav-group">
+                <div class="nav-group-title">Overview</div>
+                <a class="nav-link" href="{% url 'dashboard_home' %}"><i class="nav-icon fa-solid fa-house"></i> Dashboard</a>
+                <a class="nav-link active" href="{% url 'patients' %}"><i class="nav-icon fa-solid fa-users"></i> Patients</a>
+                <a class="nav-link" href="{% url 'doctor_home' %}"><i class="nav-icon fa-solid fa-user-doctor"></i> Doctors</a>
+                <a class="nav-link" href="{% url 'appointments_home' %}"><i class="nav-icon fa-solid fa-calendar-check"></i> Appointments</a>
+                <a class="nav-link" href="{% url 'profile' %}"><i class="nav-icon fa-solid fa-user"></i> Profile</a>
+            </div>
+        </aside>
+
+        <main class="main">
+            <header class="topbar">
+                <div>
+                    <p class="section-kicker">Patient records</p>
+                    <h1>{% if is_edit %}Edit patient{% else %}Add patient{% endif %}</h1>
+                </div>
+            </header>
+
+            <section class="card" style="max-width: 760px;">
+                {% if messages %}
+                    {% for message in messages %}
+                        <div class="pill {% if message.tags == 'error' %}danger{% else %}success{% endif %}" style="margin-bottom: 16px; display: inline-block;">{{ message }}</div>
+                    {% endfor %}
+                {% endif %}
+
+                <form method="post" style="display:grid; gap:18px;">
+                    {% csrf_token %}
+                    <div style="display:grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap:18px;">
+                        <div>
+                            <label style="display:block; margin-bottom:8px; color: var(--muted); font-weight:600;">First name</label>
+                            <input type="text" name="first_name" value="{{ patient.first_name|default:'' }}" required style="width:100%; padding: 12px 14px; border-radius: 12px; border:1px solid var(--line); background: var(--panel-soft);">
+                        </div>
+                        <div>
+                            <label style="display:block; margin-bottom:8px; color: var(--muted); font-weight:600;">Last name</label>
+                            <input type="text" name="last_name" value="{{ patient.last_name|default:'' }}" required style="width:100%; padding: 12px 14px; border-radius: 12px; border:1px solid var(--line); background: var(--panel-soft);">
+                        </div>
+                        <div>
+                            <label style="display:block; margin-bottom:8px; color: var(--muted); font-weight:600;">Email</label>
+                            <input type="email" name="email" value="{{ patient.email|default:'' }}" style="width:100%; padding: 12px 14px; border-radius: 12px; border:1px solid var(--line); background: var(--panel-soft);">
+                        </div>
+                        <div>
+                            <label style="display:block; margin-bottom:8px; color: var(--muted); font-weight:600;">Phone</label>
+                            <input type="text" name="phone" value="{{ patient.phone|default:'' }}" style="width:100%; padding: 12px 14px; border-radius: 12px; border:1px solid var(--line); background: var(--panel-soft);">
+                        </div>
+                        <div>
+                            <label style="display:block; margin-bottom:8px; color: var(--muted); font-weight:600;">Date of birth</label>
+                            <input type="date" name="date_of_birth" value="{{ patient.date_of_birth|date:'Y-m-d'|default:'' }}" style="width:100%; padding: 12px 14px; border-radius: 12px; border:1px solid var(--line); background: var(--panel-soft);">
+                        </div>
+                        <div>
+                            <label style="display:block; margin-bottom:8px; color: var(--muted); font-weight:600;">Gender</label>
+                            <select name="gender" style="width:100%; padding: 12px 14px; border-radius: 12px; border:1px solid var(--line); background: var(--panel-soft);">
+                                <option value="">-- Select --</option>
+                                <option value="male" {% if patient.gender == 'male' %}selected{% endif %}>Male</option>
+                                <option value="female" {% if patient.gender == 'female' %}selected{% endif %}>Female</option>
+                                <option value="other" {% if patient.gender == 'other' %}selected{% endif %}>Other</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div>
+                        <label style="display:block; margin-bottom:8px; color: var(--muted); font-weight:600;">Address</label>
+                        <textarea name="address" rows="4" style="width:100%; padding: 12px 14px; border-radius: 12px; border:1px solid var(--line); background: var(--panel-soft); resize: vertical;">{{ patient.address|default:'' }}</textarea>
+                    </div>
+                    <div style="display:flex; gap:12px; flex-wrap:wrap;">
+                        <button class="toggle-btn" type="submit">{% if is_edit %}Update patient{% else %}Add patient{% endif %}</button>
+                        <a href="{% url 'patients' %}" class="badge" style="text-decoration:none;">Back to list</a>
+                    </div>
+                </form>
+            </section>
+        </main>
+    </div>
+</body>
+</html>

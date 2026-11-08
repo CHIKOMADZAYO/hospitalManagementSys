@@ -1,0 +1,81 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Billing</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link rel="stylesheet" href="{% static 'dashboard/styles.css' %}">
+</head>
+<body>
+    <div class="dashboard-shell">
+        <aside class="sidebar">
+            <div class="brand">
+                <div class="brand-mark">+</div>
+                <h2>CareSync</h2>
+            </div>
+            <div class="nav-group">
+                <div class="nav-group-title">Overview</div>
+                <a class="nav-link" href="{% url 'dashboard_home' %}"><i class="nav-icon fa-solid fa-house"></i> Dashboard</a>
+                <a class="nav-link" href="{% url 'patients' %}"><i class="nav-icon fa-solid fa-users"></i> Patients</a>
+                <a class="nav-link" href="{% url 'doctor_home' %}"><i class="nav-icon fa-solid fa-user-doctor"></i> Doctors</a>
+                <a class="nav-link" href="{% url 'appointments_home' %}"><i class="nav-icon fa-solid fa-calendar-check"></i> Appointments</a>
+                <a class="nav-link" href="{% url 'profile' %}"><i class="nav-icon fa-solid fa-user"></i> Profile</a>
+            </div>
+            <div class="nav-group">
+                <div class="nav-group-title">Operations</div>
+                <a class="nav-link" href="{% url 'departments_home' %}"><i class="nav-icon fa-solid fa-hospital"></i> Departments</a>
+                <a class="nav-link active" href="{% url 'payments_home' %}"><i class="nav-icon fa-solid fa-credit-card"></i> Billing</a>
+                <a class="nav-link" href="{% url 'logout' %}"><i class="nav-icon fa-solid fa-right-from-bracket"></i> Logout</a>
+            </div>
+        </aside>
+
+        <main class="main">
+            <header class="topbar">
+                <div>
+                    <p class="section-kicker">Finance</p>
+                    <h1>Billing</h1>
+                </div>
+                <div class="profile-pill">
+                    <div class="avatar">{{ request.user.username|slice:':1'|upper }}</div>
+                    <div>
+                        <strong>{{ request.user.username }}</strong><br>
+                        <small>{{ request.user.profile.role|title }}</small>
+                    </div>
+                </div>
+            </header>
+
+            <section class="card">
+                <div class="card-header">
+                    <h3>Invoices</h3>
+                    <span class="badge">{{ invoices|length }} entries</span>
+                </div>
+
+                <div class="table-wrap">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Patient</th>
+                                <th>Amount</th>
+                                <th>Status</th>
+                                <th>Date</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for invoice in invoices %}
+                                <tr>
+                                    <td>{{ invoice.patient }}</td>
+                                    <td>{{ invoice.amount }}</td>
+                                    <td><span class="pill {% if invoice.status == 'Paid' %}success{% elif invoice.status == 'Pending' %}warning{% else %}danger{% endif %}">{{ invoice.status }}</span></td>
+                                    <td>{{ invoice.date }}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </main>
+    </div>
+</body>
+</html>

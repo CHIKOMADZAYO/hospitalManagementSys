@@ -1,0 +1,78 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Departments</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link rel="stylesheet" href="{% static 'dashboard/styles.css' %}">
+</head>
+<body>
+    <div class="dashboard-shell">
+        <aside class="sidebar">
+            <div class="brand">
+                <div class="brand-mark">+</div>
+                <h2>CareSync</h2>
+            </div>
+            <div class="nav-group">
+                <div class="nav-group-title">Overview</div>
+                <a class="nav-link" href="{% url 'dashboard_home' %}"><i class="nav-icon fa-solid fa-house"></i> Dashboard</a>
+                <a class="nav-link" href="{% url 'patients' %}"><i class="nav-icon fa-solid fa-users"></i> Patients</a>
+                <a class="nav-link" href="{% url 'doctor_home' %}"><i class="nav-icon fa-solid fa-user-doctor"></i> Doctors</a>
+                <a class="nav-link" href="{% url 'appointments_home' %}"><i class="nav-icon fa-solid fa-calendar-check"></i> Appointments</a>
+                <a class="nav-link" href="{% url 'profile' %}"><i class="nav-icon fa-solid fa-user"></i> Profile</a>
+            </div>
+            <div class="nav-group">
+                <div class="nav-group-title">Operations</div>
+                <a class="nav-link active" href="{% url 'departments_home' %}"><i class="nav-icon fa-solid fa-hospital"></i> Departments</a>
+                <a class="nav-link" href="{% url 'payments_home' %}"><i class="nav-icon fa-solid fa-credit-card"></i> Billing</a>
+                <a class="nav-link" href="{% url 'logout' %}"><i class="nav-icon fa-solid fa-right-from-bracket"></i> Logout</a>
+            </div>
+        </aside>
+
+        <main class="main">
+            <header class="topbar">
+                <div>
+                    <p class="section-kicker">Operations</p>
+                    <h1>Departments</h1>
+                </div>
+                <div class="profile-pill">
+                    <div class="avatar">{{ request.user.username|slice:':1'|upper }}</div>
+                    <div>
+                        <strong>{{ request.user.username }}</strong><br>
+                        <small>{{ request.user.profile.role|title }}</small>
+                    </div>
+                </div>
+            </header>
+
+            <section class="dashboard-panels">
+                {% if departments %}
+                    {% for department in departments %}
+                        <div class="card">
+                            <div class="card-header">
+                                <h3>{{ department.name }}</h3>
+                                <span class="pill {% if department.status == 'open' %}success{% elif department.status == 'busy' %}warning{% else %}warning{% endif %}">
+                                    {{ department.get_status_display }}
+                                </span>
+                            </div>
+                            <ul class="list">
+                                <li><span>Department head</span><strong>{{ department.head|default:'To be assigned' }}</strong></li>
+                                <li><span>Capacity</span><strong>{{ department.capacity }} beds</strong></li>
+                                <li><span>Availability</span><strong>{{ department.get_status_display }}</strong></li>
+                            </ul>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="card empty-state">
+                        <div class="card-header">
+                            <h3>No departments yet</h3>
+                        </div>
+                        <p>Add departments to begin tracking capacity, staffing, and clinical operations.</p>
+                    </div>
+                {% endif %}
+            </section>
+        </main>
+    </div>
+</body>
+</html>
